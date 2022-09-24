@@ -22,10 +22,11 @@ export default class GameSearch extends LightningElement {
             .then(data => {
                 //keep a full version of the list of games for filtering/sorting reasons
                 this.games = data;
+                this.filteredGames = this.games;
 
-                //initially sort for A to Z as that is the default
-                this.filteredGames = this.games.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
+                //sort and filter the list according to currently selected values
                 this.filterPrice(this.template.querySelector('lightning-combobox[data-id=filterDropdown]').value);
+                this.sort(this.template.querySelector('lightning-combobox[data-id=sortingDropdown]').value);
             })
             .catch((error) => {
                 const event = new ShowToastEvent({
@@ -64,7 +65,7 @@ export default class GameSearch extends LightningElement {
     }
 s
     filterPrice(filterValue) {
-            //make variables to track the filter ranges
+            //make variables to track the filter price ranges
             let lowerBound;
             let upperBound;
 
@@ -73,8 +74,7 @@ s
     
             switch(filterValue) {
                 case 'none':
-                    this.showGames = true;
-                    this.showFilteredGames = false;
+                    this.filteredGames = this.games;
                     this.sort(sortingCondition);
                     break;
                 case 'fifteenMinus':
@@ -103,19 +103,21 @@ s
     }
 
     sort(sortCondition) {
-        switch(sortCondition) {
-            case 'aToZ':
-                this.filteredGames.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
-                break;
-            case 'zToA':
-                this.filteredGames.sort((a,b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0));
-                break;
-            case 'lowToHigh':
-                this.filteredGames.sort((a,b) => (parseInt(a.salePrice) > parseInt(b.salePrice)) ? 1 : ((parseInt(b.salePrice) > parseInt(a.salePrice)) ? -1 : 0));
-                break;
-            case 'highToLow':
-                this.filteredGames.sort((a,b) => (parseInt(a.salePrice) < parseInt(b.salePrice)) ? 1 : ((parseInt(b.salePrice) < parseInt(a.salePrice)) ? -1 : 0));
-                break;
+        if(this.filteredGames) {
+            switch(sortCondition) {
+                case 'aToZ':
+                    this.filteredGames.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
+                    break;
+                case 'zToA':
+                    this.filteredGames.sort((a,b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0));
+                    break;
+                case 'lowToHigh':
+                    this.filteredGames.sort((a,b) => (parseFloat(a.salePrice) > parseFloat(b.salePrice)) ? 1 : ((parseFloat(b.salePrice) > parseFloat(a.salePrice)) ? -1 : 0));
+                    break;
+                case 'highToLow':
+                    this.filteredGames.sort((a,b) => (parseFloat(a.salePrice) < parseFloat(b.salePrice)) ? 1 : ((parseFloat(b.salePrice) < parseFloat(a.salePrice)) ? -1 : 0));
+                    break;
+            }
         }
     }
 
