@@ -1,0 +1,61 @@
+<template>
+    <lightning-card>
+        <div class="slds-m-left_medium">
+            <lightning-input></lightning-input>
+            <lightning-button label="Search" onclick={searchGames}></lightning-button>
+            <lightning-combobox
+                name="progress"
+                label="Sorting Options"
+                value={value}
+                placeholder="Sort"
+                options={sortingOptions}
+                onchange={sortGames}>
+            </lightning-combobox>
+        </div>
+        <div class="slds-m-left_medium">
+            <h1>Filter</h1>
+            <div>
+                <lightning-combobox
+                name="progress"
+                label="Price"
+                value={value}
+                placeholder="Price"
+                options={filterOptions}
+                onchange={filterGames}>
+            </lightning-combobox>
+            </div>
+        </div>
+    </lightning-card>
+    <template if:true={showGames}>
+        <template for:each={games} for:item="game">
+            <lightning-card class="slds-m-bottom_small" key={game.dealID}>
+                <div class="slds-m-left_small">
+                    <a onclick={displayMoreInfo} title={game.storeID}>{game.title}</a>
+                    <p>Current Sale Price: ${game.salePrice}</p>
+                </div>
+            </lightning-card>
+        </template>
+    </template>
+    <template if:true={showFilteredGames}>
+        <template for:each={filteredGames} for:item="game">
+            <lightning-card class="slds-m-bottom_small" key={game.dealID}>
+                <div class="slds-m-left_small">
+                    <a onclick={displayMoreInfo} title={game.storeID}>{game.title}</a>
+                    <p>Current Sale Price: ${game.salePrice}</p>
+                </div>
+            </lightning-card>
+        </template>
+    </template>
+    <template if:true={displayModal}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-label="Meaningful description of the modal content" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <img src={gameImage}>
+                <div class="slds-modal__header slds-align_center">{gameName}</div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={displayLessInfo} aria-label="Cancel and close">Close</button>
+                </div>
+            </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>
