@@ -5,10 +5,6 @@ export default class GameSearch extends LightningElement {
     @track games = [];
     @track filteredGames = null;
 
-    //variables to decide which list to show
-    showFilteredGames = false;
-    showGames;
-
     //sortingDropDown Variable
     value = 'aToZ';
 
@@ -19,13 +15,17 @@ export default class GameSearch extends LightningElement {
 
     searchGames(event) {
         let searchInput = this.template.querySelector('lightning-input').value;
-        this.showGames = true;
         //search cheapshark deals with the text from input field only when not empty
         if(searchInput != '') {
             fetch('https://www.cheapshark.com/api/1.0/deals?title=' + searchInput)
             .then((res) => res.json())
             .then(data => {
+                //keep a full version of the list of games for filtering/sorting reasons
                 this.games = data;
+
+                //initially sort for A to Z as that is the default
+                this.filteredGames = this.games.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
+                this.filterPrice(this.template.querySelector('lightning-combobox[data-id=filterDropdown]').value);
             })
             .catch((error) => {
                 const event = new ShowToastEvent({
@@ -55,51 +55,66 @@ export default class GameSearch extends LightningElement {
         this.displayModal = false;
     }
 
-    sortGames(event) {    
-        switch(event.target.value) {
-            case 'aToZ':
-                this.games.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
-                break;
-            case 'zToA':
-                this.games.sort((a,b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0));
-                break;
-            case 'lowToHigh':
-                this.games.sort((a,b) => (parseInt(a.salePrice) > parseInt(b.salePrice)) ? 1 : ((parseInt(b.salePrice) > parseInt(a.salePrice)) ? -1 : 0));
-                break;
-            case 'highToLow':
-                this.games.sort((a,b) => (parseInt(a.salePrice) < parseInt(b.salePrice)) ? 1 : ((parseInt(b.salePrice) < parseInt(a.salePrice)) ? -1 : 0));
-                break;
-        }
+    sortGames(event) {
+        this.sort(event.target.value);
     }
 
-    filterGames(event) {
-        //show only the filtered results and hide the nonfiltered results
-        this.showGames = false;
-        this.showFilteredGames = true;
+    filterGamesPrice(event) {
+        this.filterPrice(event.target.value);
+    }
+s
+    filterPrice(filterValue) {
+            //make variables to track the filter ranges
+            let lowerBound;
+            let upperBound;
 
-        //make variables to track the filter ranges
-        let lowerBound;
-        let upperBound;
+            //grab the current sorting condition in order to re-sort after the filter
+            let sortingCondition = this.template.querySelector('lightning-combobox[data-id=sortingDropdown]').value;
+    
+            switch(filterValue) {
+                case 'none':
+                    this.showGames = true;
+                    this.showFilteredGames = false;
+                    this.sort(sortingCondition);
+                    break;
+                case 'fifteenMinus':
+                    upperBound = 15;
+                    this.filteredGames = this.games.filter(game => game.salePrice <= upperBound);
+                    this.sort(sortingCondition);
+                    break;
+                case 'fifteentoThirty':
+                    lowerBound = 15;
+                    upperBound = 30;
+                    this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound && game.salePrice < upperBound);
+                    this.sort(sortingCondition);
+                    break;
+                case 'thirtyToFortyFive':
+                    lowerBound = 30;
+                    upperBound = 45;
+                    this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound && game.salePrice < upperBound);
+                    this.sort(sortingCondition);
+                    break;
+                case 'fortyFivePlus':
+                    lowerBound = 45;
+                    this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound);
+                    this.sort(sortingCondition);
+                    break;
+            }
+    }
 
-        switch(event.target.value) {
-            case 'none':
-                this.showGames = true;
-                this.showFilteredGames = false;
+    sort(sortCondition) {
+        switch(sortCondition) {
+            case 'aToZ':
+                this.filteredGames.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
                 break;
-            case 'fifteenMinus':
-                upperBound = 15;
-                this.filteredGames = this.games.filter(game => game.salePrice <= upperBound);
+            case 'zToA':
+                this.filteredGames.sort((a,b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0));
                 break;
-            case 'fifteentoThirty':
-                lowerBound = 15;
-                upperBound = 30;
-                this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound && game.salePrice < upperBound);
+            case 'lowToHigh':
+                this.filteredGames.sort((a,b) => (parseInt(a.salePrice) > parseInt(b.salePrice)) ? 1 : ((parseInt(b.salePrice) > parseInt(a.salePrice)) ? -1 : 0));
                 break;
-            case 'thirtyToFortyFive':
-                this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound && game.salePrice < upperBound);
-                break;
-            case 'fortyFivePlus':
-                this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound);
+            case 'highToLow':
+                this.filteredGames.sort((a,b) => (parseInt(a.salePrice) < parseInt(b.salePrice)) ? 1 : ((parseInt(b.salePrice) < parseInt(a.salePrice)) ? -1 : 0));
                 break;
         }
     }

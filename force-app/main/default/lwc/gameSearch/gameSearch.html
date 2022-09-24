@@ -9,7 +9,8 @@
                 value={value}
                 placeholder="Sort"
                 options={sortingOptions}
-                onchange={sortGames}>
+                onchange={sortGames}
+                data-id="sortingDropdown">
             </lightning-combobox>
         </div>
         <div class="slds-m-left_medium">
@@ -21,24 +22,15 @@
                 value={value}
                 placeholder="Price"
                 options={filterOptions}
-                onchange={filterGames}>
+                onchange={filterGamesPrice}
+                data-id="filterDropdown">
             </lightning-combobox>
             </div>
         </div>
     </lightning-card>
-    <template if:true={showGames}>
-        <template for:each={games} for:item="game">
-            <lightning-card class="slds-m-bottom_small" key={game.dealID}>
-                <div class="slds-m-left_small">
-                    <a onclick={displayMoreInfo} title={game.storeID}>{game.title}</a>
-                    <p>Current Sale Price: ${game.salePrice}</p>
-                </div>
-            </lightning-card>
-        </template>
-    </template>
-    <template if:true={showFilteredGames}>
+    <template if:true={filteredGames}>
         <template for:each={filteredGames} for:item="game">
-            <lightning-card class="slds-m-bottom_small" key={game.dealID}>
+            <lightning-card class="slds-m-around_xx-small" key={game.dealID}>
                 <div class="slds-m-left_small">
                     <a onclick={displayMoreInfo} title={game.storeID}>{game.title}</a>
                     <p>Current Sale Price: ${game.salePrice}</p>
