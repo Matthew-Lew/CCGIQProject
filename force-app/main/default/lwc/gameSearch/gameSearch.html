@@ -1,45 +1,53 @@
 <template>
-    <lightning-card>
-        <div class="slds-m-left_medium">
-            <lightning-input></lightning-input>
-            <lightning-button label="Search" onclick={searchGames}></lightning-button>
-            <lightning-combobox
-                name="progress"
-                label="Sorting Options"
-                value={value}
-                placeholder="Sort"
-                options={sortingOptions}
-                onchange={sortGames}
-                data-id="sortingDropdown">
-            </lightning-combobox>
-        </div>
-        <div class="slds-m-left_medium">
-            <h1>Filter</h1>
-            <div>
-                <lightning-combobox
-                name="progress"
-                label="Price"
-                value={value}
-                placeholder="Price"
-                options={filterOptions}
-                onchange={filterGamesPrice}
-                data-id="filterDropdown">
-            </lightning-combobox>
+    <div class="slds-grid slds-grid_align-center">
+        <div class="slds-grid slds-col slds-size_1-of-1 custom-card page">
+            <div class="slds-grid slds-col slds-wrap slds-size_1-of-3 slds-m-left_medium">
+                <div class="slds-grid slds-grid_vertical-align-center slds-col">
+                    <lightning-input class="slds-col slds-m-top_none" label="Game Search" type="search" placeholder="Find your favorite games!"></lightning-input>
+                    <lightning-button class="slds-col margin-top slds-m-left_x-small" label="Search" onclick={searchGames}></lightning-button>
+                </div>
+            </div>
+            <div class="slds-col slds-grid slds-grid_align-center slds-size_1-of-3">
+                <lightning-combobox class="slds-col slds-size_10-of-12"
+                    name="progress"
+                    label="Sorting Options"
+                    value={sortingCondition}
+                    placeholder="Sort"
+                    options={sortingOptions}
+                    onchange={sortGames}
+                    data-id="sortingDropdown">
+                </lightning-combobox>
+            </div>
+            <div class="slds-col slds-grid slds-grid_align-space slds-size_1-of-3">
+                    <lightning-combobox class="slds-col slds-size_10-of-12"
+                    name="progress"
+                    label="Price Filter"
+                    value={filteringCondition}
+                    placeholder="Price"
+                    options={filterOptions}
+                    onchange={filterGamesPrice}
+                    data-id="filterDropdown">
+                </lightning-combobox>
             </div>
         </div>
-    </lightning-card>
-    <template if:true={filteredGames}>
-        <template for:each={filteredGames} for:item="game">
-            <lightning-card class="slds-m-around_xx-small" key={game.dealID}>
-                <div class="slds-m-left_small">
-                    <a onclick={displayMoreInfo} title={game.storeID}>{game.title}</a>
-                    <p>Current Sale Price: ${game.salePrice}</p>
+    </div>
+    <div class="slds-grid slds-grid_align-center slds-wrap">
+        <template if:true={filteredGames}>
+            <template for:each={filteredGames} for:item="game">
+                <div class="custom-card slds-col slds-grid slds-p-around_none slds-size_1-of-1 slds-m-around_xx-small page" key={game.dealID}>
+                    <template if:true={game.highRating}><div class="slds-m-left_none slds-size_1-of-12 highRating">a</div></template>
+                    <template if:true={game.medRating}><div class="medRating">b</div></template>
+                    <template if:true={game.lowRating}><div class="lowRating">c</div></template>
+                    <div class="slds-col slds-p-around_large slds-m-left_small">
+                        <a onclick={displayMoreInfo} title={game.dealID}>{game.title}</a>
+                        <p>Current Sale Price: ${game.salePrice}</p>
+                    </div>
                 </div>
-            </lightning-card>
+            </template>
         </template>
-    </template>
+    </div>
     <template if:true={displayModal}>
-        <section role="dialog" tabindex="-1" aria-modal="true" aria-label="Meaningful description of the modal content" class="slds-modal slds-fade-in-open">
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">
                 <img src={gameImage}>
                 <div class="slds-modal__header slds-align_center">{gameName}</div>

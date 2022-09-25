@@ -1,0 +1,32 @@
+.custom-card {
+    background-color: white;
+    padding: 1rem 1rem 1rem 1rem;
+    border-radius: 5px;
+}
+.margin-top {
+    margin-top: 1.5rem;
+}
+.highRating {
+    background-color: green;
+    color: green;
+    width: 1rem;
+    height: inherit;
+    border-radius: 5px 0 0 5px;
+}
+.medRating {
+    background-color: yellow;
+    color: yellow;
+    width: 1rem;
+    height: inherit;
+    border-radius: 5px 0 0 5px;
+}
+.lowRating {
+    background-color: red;
+    color: red;
+    width: 1rem;
+    height: inherit;
+    border-radius: 5px 0 0 5px;
+}
+.page {
+    max-width: 1200px;
+}
