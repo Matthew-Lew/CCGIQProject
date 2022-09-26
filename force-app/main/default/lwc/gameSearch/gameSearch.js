@@ -40,7 +40,6 @@ export default class GameSearch extends LightningElement {
                 this.games = data;
                 this.filteredGames = this.games;
                 this.totalNumResults = this.games.length;
-                console.log(this.totalNumResults);
                 
                 for(let game of this.filteredGames) {
                     this.evaluateRating(game);
@@ -58,7 +57,6 @@ export default class GameSearch extends LightningElement {
                     variant: 'error'
                 });
                 this.dispatchEvent(event);
-                console.log(error);
             })
         }
     }
