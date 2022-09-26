@@ -14,7 +14,7 @@ export default class GameSearch extends LightningElement {
 
     //keeping track of filtering and sorting conditions
     sortingCondition = 'aToZ';
-    filteringCondition = 'none';
+    priceFilteringCondition = 'none';
 
     //Modal Variables
     displayModal = false;
@@ -117,12 +117,12 @@ export default class GameSearch extends LightningElement {
 
     sortGames(event) {
         this.sortingCondition = event.target.value;
-        this.sort(this.sortingCondition);
+        this.sort();
     }
 
     filterGamesPrice(event) {
-        this.filteringCondition = event.target.value;
-        this.filterPrice(this.filteringCondition);
+        this.priceFilteringCondition = event.target.value;
+        this.filterPrice();
     }
     
     showCurrentPage() {
@@ -133,7 +133,7 @@ export default class GameSearch extends LightningElement {
         } else {
             this.noNextPage = false;
         }
-        if(this.currentPage - 1 == 0) {
+        if(this.currentPage == 1) {
             this.noPrevPage = true;
         } else {
             this.noPrevPage = false;
@@ -142,50 +142,30 @@ export default class GameSearch extends LightningElement {
 
     filterPrice() {
             //make variables to track the filter price ranges
-            let lowerBound;
-            let upperBound;
+            let lowerBound = null;
+            let upperBound = null;
     
-            switch(this.filteringCondition) {
+            switch(this.priceFilteringCondition) {
                 case 'none':
-                    this.filteredGames = this.games;
-                    this.totalNumResults = this.filteredGames.length;
-                    this.sort();
-                    this.currentPage = 1;
-                    this.showCurrentPage();
+                    this.filterGames(lowerBound, upperBound);
                     break;
                 case 'fifteenMinus':
                     upperBound = 15;
-                    this.filteredGames = this.games.filter(game => game.salePrice <= upperBound);
-                    this.totalNumResults = this.filteredGames.length;
-                    this.sort();
-                    this.currentPage = 1;
-                    this.showCurrentPage();
+                    this.filterGames(lowerBound, upperBound);
                     break;
                 case 'fifteentoThirty':
                     lowerBound = 15;
                     upperBound = 30;
-                    this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound && game.salePrice < upperBound);
-                    this.totalNumResults = this.filteredGames.length;
-                    this.sort();
-                    this.currentPage = 1;
-                    this.showCurrentPage();
+                    this.filterGames(lowerBound, upperBound);
                     break;
                 case 'thirtyToFortyFive':
                     lowerBound = 30;
                     upperBound = 45;
-                    this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound && game.salePrice < upperBound);
-                    this.totalNumResults = this.filteredGames.length;
-                    this.sort();
-                    this.currentPage = 1;
-                    this.showCurrentPage();
+                    this.filterGames(lowerBound, upperBound);
                     break;
                 case 'fortyFivePlus':
                     lowerBound = 45;
-                    this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound);
-                    this.totalNumResults = this.filteredGames.length;
-                    this.sort();
-                    this.currentPage = 1;
-                    this.showCurrentPage();
+                    this.filterGames(lowerBound, upperBound);
                     break;
             }
     }
@@ -221,11 +201,27 @@ export default class GameSearch extends LightningElement {
         }
     }
 
+    filterGames(lowerBound, upperBound) {
+        //check the bounds and filter based on the price bounds given
+        if(upperBound == null && lowerBound == null) {
+            this.filteredGames = this.games;
+        } else if (lowerBound == null && upperBound != null) {
+            this.filteredGames = this.games.filter(game => game.salePrice <= upperBound);
+        } else if(upperBound == null && lowerBound != null) {
+            this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound);
+        } else {
+            this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound && game.salePrice < upperBound);
+        }
+        //check the new number of results then sort and set the current page to 1
+        this.totalNumResults = this.filteredGames.length
+        this.sort();
+        this.currentPage = 1;
+        this.showCurrentPage();
+    }
+ 
     previousPage() {
-        if(this.currentPage > 1) {
             this.currentPage--;
             this.showCurrentPage();
-        }
     }
 
     nextPage() {
@@ -261,7 +257,7 @@ export default class GameSearch extends LightningElement {
         ];
     }
 
-    get filterOptions() {
+    get filterPriceOptions() {
         return [
             { label: 'None', value: 'none' },
             { label: '$15 or less', value: 'fifteenMinus' },

@@ -24,7 +24,7 @@
                     label="Price Filter"
                     value={filteringCondition}
                     placeholder="Price"
-                    options={filterOptions}
+                    options={filterPriceOptions}
                     onchange={filterGamesPrice}
                     data-id="filterDropdown">
                 </lightning-combobox>
@@ -46,7 +46,7 @@
             </template>
         </template>
     </div>
-    <template if:true={filteredGames}>
+    <template if:true={displayGames}>
         <div class="slds-grid slds-grid_align-center">
             <div class="custom-card page slds-col slds-grid slds-grid_vertical-align-center slds-grid_align-center slds-size_1-of-1">
                 <lightning-button class="slds-col slds-m-right_xxx-small" disabled={noPrevPage} onclick={previousPage} label="prev"></lightning-button>
