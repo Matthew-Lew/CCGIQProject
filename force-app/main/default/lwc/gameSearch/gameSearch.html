@@ -33,7 +33,7 @@
     </div>
     <div class="slds-grid slds-grid_align-center slds-wrap">
         <template if:true={filteredGames}>
-            <template for:each={filteredGames} for:item="game">
+            <template for:each={displayGames} for:item="game">
                 <div class="custom-card slds-col slds-grid slds-p-around_none slds-size_1-of-1 slds-m-around_xx-small page" key={game.dealID}>
                     <template if:true={game.highRating}><div class="slds-m-left_none slds-size_1-of-12 highRating">a</div></template>
                     <template if:true={game.medRating}><div class="medRating">b</div></template>
@@ -46,6 +46,14 @@
             </template>
         </template>
     </div>
+    <template if:true={filteredGames}>
+        <div class="slds-grid slds-grid_align-center">
+            <div class="custom-card page slds-col slds-grid slds-grid_vertical-align-center slds-grid_align-center slds-size_1-of-1">
+                <lightning-button class="slds-col slds-m-right_xxx-small" disabled={noPrevPage} onclick={previousPage} label="prev"></lightning-button>
+                <lightning-button class="slds-col slds-m-left_xxx-small" disabled={noNextPage} onclick={nextPage} label="next"></lightning-button>
+            </div>
+        </div>
+    </template>
     <template if:true={displayModal}>
         <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
             <div class="slds-grid slds-modal__container">

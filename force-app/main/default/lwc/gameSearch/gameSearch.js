@@ -5,6 +5,12 @@ export default class GameSearch extends LightningElement {
     @track stores;
     @track games;
     @track filteredGames;
+    @track displayGames;
+    currentPage = 1;
+    totalNumResults;
+    noNextPage = false;
+    noPrevPage = true;
+    numGamesToShow = 10;
 
     //keeping track of filtering and sorting conditions
     sortingCondition = 'aToZ';
@@ -33,14 +39,16 @@ export default class GameSearch extends LightningElement {
                 //keep a full version of the list of games for filtering/sorting reasons
                 this.games = data;
                 this.filteredGames = this.games;
+                this.totalNumResults = this.games.length;
+                console.log(this.totalNumResults);
                 
                 for(let game of this.filteredGames) {
                     this.evaluateRating(game);
                 }
-                console.log(this.filteredGames[0]);
                 //sort and filter the list according to currently selected values
                 this.filterPrice();
                 this.sort();
+                this.showCurrentPage();
             })
             .catch((error) => {
                 const event = new ShowToastEvent({
@@ -50,6 +58,7 @@ export default class GameSearch extends LightningElement {
                     variant: 'error'
                 });
                 this.dispatchEvent(event);
+                console.log(error);
             })
         }
     }
@@ -59,7 +68,6 @@ export default class GameSearch extends LightningElement {
 
         //find the game object clicked on using title field on the html a tag
         let currentObject = this.games.find(game => game.dealID == event.target.title);
-        console.log(currentObject);
 
         fetch('https://www.cheapshark.com/api/1.0/stores')
         .then(res => res.json())
@@ -118,7 +126,22 @@ export default class GameSearch extends LightningElement {
         this.filteringCondition = event.target.value;
         this.filterPrice(this.filteringCondition);
     }
-s
+    
+    showCurrentPage() {
+        //get the current page and display the 10 records for that page
+        this.displayGames = this.filteredGames.slice((this.currentPage -1) * this.numGamesToShow, (this.currentPage) * this.numGamesToShow);
+        if(this.totalNumResults <= this.currentPage * this.numGamesToShow) {
+            this.noNextPage = true;
+        } else {
+            this.noNextPage = false;
+        }
+        if(this.currentPage - 1 == 0) {
+            this.noPrevPage = true;
+        } else {
+            this.noPrevPage = false;
+        }
+    }
+
     filterPrice() {
             //make variables to track the filter price ranges
             let lowerBound;
@@ -127,29 +150,44 @@ s
             switch(this.filteringCondition) {
                 case 'none':
                     this.filteredGames = this.games;
+                    this.totalNumResults = this.filteredGames.length;
                     this.sort();
+                    this.currentPage = 1;
+                    this.showCurrentPage();
                     break;
                 case 'fifteenMinus':
                     upperBound = 15;
                     this.filteredGames = this.games.filter(game => game.salePrice <= upperBound);
+                    this.totalNumResults = this.filteredGames.length;
                     this.sort();
+                    this.currentPage = 1;
+                    this.showCurrentPage();
                     break;
                 case 'fifteentoThirty':
                     lowerBound = 15;
                     upperBound = 30;
                     this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound && game.salePrice < upperBound);
+                    this.totalNumResults = this.filteredGames.length;
                     this.sort();
+                    this.currentPage = 1;
+                    this.showCurrentPage();
                     break;
                 case 'thirtyToFortyFive':
                     lowerBound = 30;
                     upperBound = 45;
                     this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound && game.salePrice < upperBound);
+                    this.totalNumResults = this.filteredGames.length;
                     this.sort();
+                    this.currentPage = 1;
+                    this.showCurrentPage();
                     break;
                 case 'fortyFivePlus':
                     lowerBound = 45;
                     this.filteredGames = this.games.filter(game => game.salePrice >= lowerBound);
+                    this.totalNumResults = this.filteredGames.length;
                     this.sort();
+                    this.currentPage = 1;
+                    this.showCurrentPage();
                     break;
             }
     }
@@ -159,18 +197,42 @@ s
             switch(this.sortingCondition) {
                 case 'aToZ':
                     this.filteredGames.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
+                    this.showCurrentPage();
                     break;
                 case 'zToA':
                     this.filteredGames.sort((a,b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0));
+                    this.showCurrentPage();
                     break;
-                case 'lowToHigh':
+                case 'priceLowToHigh':
                     this.filteredGames.sort((a,b) => (parseFloat(a.salePrice) > parseFloat(b.salePrice)) ? 1 : ((parseFloat(b.salePrice) > parseFloat(a.salePrice)) ? -1 : 0));
+                    this.showCurrentPage();
                     break;
-                case 'highToLow':
+                case 'priceHighToLow':
                     this.filteredGames.sort((a,b) => (parseFloat(a.salePrice) < parseFloat(b.salePrice)) ? 1 : ((parseFloat(b.salePrice) < parseFloat(a.salePrice)) ? -1 : 0));
+                    this.showCurrentPage();
+                    break;
+                case 'ratingHighToLow':
+                    this.filteredGames.sort((a,b) => (a.dealRating < b.dealRating) ? 1 : ((b.dealRating < a.dealRating) ? -1 : 0));
+                    this.showCurrentPage();
+                    break;
+                case 'ratingLowToHigh':
+                    this.filteredGames.sort((a,b) => (a.dealRating > b.dealRating) ? 1 : ((b.dealRating > a.dealRating) ? -1 : 0));
+                    this.showCurrentPage();
                     break;
             }
         }
+    }
+
+    previousPage() {
+        if(this.currentPage > 1) {
+            this.currentPage--;
+            this.showCurrentPage();
+        }
+    }
+
+    nextPage() {
+        this.currentPage++;
+        this.showCurrentPage();
     }
 
     evaluateRating(game) {
@@ -194,8 +256,10 @@ s
         return [
             { label: 'A to Z', value: 'aToZ' },
             { label: 'Z to A', value: 'zToA' },
-            { label: 'Price: Lowest to Highest', value: 'lowToHigh' },
-            { label: 'Price: Highest to Lowest', value: 'highToLow' }
+            { label: 'Price: Lowest to Highest', value: 'priceLowToHigh' },
+            { label: 'Price: Highest to Lowest', value: 'priceHighToLow' },
+            { label: 'Deal Rating: Highest to lowest', value: 'ratingHighToLow' },
+            { label: 'Deal Rating: Lowest to Highest', value: 'ratingLowToHigh' }
         ];
     }
 
