@@ -48,9 +48,36 @@
     </div>
     <template if:true={displayModal}>
         <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <img src={gameImage}>
-                <div class="slds-modal__header slds-align_center">{gameName}</div>
+            <div class="slds-grid slds-modal__container">
+                <div class="slds-modal__header slds-align_center">
+                    <div class="slds-col slds-m-bottom_large">
+                        <img class="modalImage" src={gameImage}>
+                    </div>
+                    <b class="slds-text-heading_medium">{gameName}</b>
+                    <div class="slds-col slds-grid slds-wrap slds-grid_align-space slds-m-top_small">
+                        <template if:true={gameRating}><div class="slds-col slds-text-heading_small slds-size_3-of-12">Deal Rating: <b>{gameRating}</b></div></template>
+                        <template if:false={gameRating}><div class="slds-col slds-text-heading_small slds-size_3-of-12">Game Rating Not Available</div></template>
+                        <template if:true={salePrice}><div class="slds-col slds-text-heading_small slds-size_3-of-12">Regular Price: <b>${normalPrice}</b></div></template>
+                        <template if:false={salePrice}><div class="slds-col slds-text-heading_small slds-size_3-of-12">Regular Price Not Available</div></template>
+                        <template if:true={normalPrice}><div class="slds-col slds-text-heading_small slds-size_3-of-12">Sale Price: <b>${salePrice}</b></div></template>
+                        <template if:false={salePrice}><div class="slds-col slds-text-heading_small slds-size_3-of-12">Sale Price Not Available</div></template>
+                        <div class="slds-grid slds-col slds-m-top_medium slds-grid_align-space slds-size_1-of-1">
+                            <div class="slds-grid slds-grid_vertical slds-grid_vertical-align-center slds-grid_align-space slds-col slds-size_5-of-12">
+                                <template if:true={steamRating}><div class="slds-col slds-text-heading_small slds-size_3-of-12">Steam Rating: <b>{steamRating}%</b></div></template>
+                                <template if:false={steamRating}><div class="slds-col slds-m-bottom_large slds-text-heading_small slds-size_3-of-12"></div>Steam Rating Not Available</template>
+                                <template if:true={steamLink}><a href={steamLink} class="slds-col slds-text-heading_small slds-size_3-of-12">Steam Link</a></template>
+                                <template if:false={steamLink}><div class="slds-col slds-text-heading_small slds-size_3-of-12"></div>Steam Link Not Available</template>
+                            </div>
+                            <div class="slds-col slds-grid_vertical slds-grid slds-grid_vertical-align-center slds-grid_align-space slds-size_5-of-12">
+                                <template if:true={metacriticRating}><div class="slds-col slds-text-heading_small slds-size_3-of-12">Metacritic Rating: <b>{metacriticRating}</b></div></template>
+                                <template if:false={metacriticRating}><div class="slds-col slds-m-bottom_large slds-text-heading_small slds-size_3-of-12"></div>Metacritic Rating Not Available</template>
+                                <template if:true={metacriticLink}><a href={metacriticLink} class="slds-col slds-text-heading_small slds-size_3-of-12">Metacritic Link</a></template>     
+                                <template if:false={metacriticLink}><div class="slds-col slds-text-heading_small slds-size_3-of-12"></div>Metacritic Link Not Available</template>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-m-top_medium slds-size_1-of-1"><b class="slds-text-heading_small">Game available for sale price at: {storeName}</b></div>
+                </div>
                 <div class="slds-modal__footer">
                     <button class="slds-button slds-button_neutral" onclick={displayLessInfo} aria-label="Cancel and close">Close</button>
                 </div>
